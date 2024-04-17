@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# https://github.com/GoogleCloudPlatform/compute-gpu-installation/blob/main/linux/install_gpu_driver.py
 import argparse
 import atexit
 import os
@@ -307,15 +308,15 @@ def install_dependencies_debian_ubuntu(system: System, version: str) -> bool:
 
     kernel_version = run("uname -r").stdout.decode().strip()
     run("apt update")
-    upgrade = run("apt upgrade -y").stdout.decode()
+    # upgrade = run("apt upgrade -y").stdout.decode()
+    # if "Generating grub configuration file" in upgrade:
+    #     # There was a kernel update, we need to reboot to work with proper kernel version
+    #     return True
     run(f"apt install -y linux-headers-{kernel_version} "
         "software-properties-common pciutils gcc make dkms")
     if system == System.Ubuntu and version.startswith("22"):
         run("update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-12 100 "
             "--slave /usr/bin/g++ g++ /usr/bin/g++-12 --slave /usr/bin/gcov gcov /usr/bin/gcov-12")
-    if "Generating grub configuration file" in upgrade:
-        # There was a kernel update, we need to reboot to work with proper kernel version
-        return True
     return False
 
 
